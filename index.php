@@ -21,7 +21,9 @@ if (isset($_SESSION['username'])) {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
+            background: url('https://www.startpage.com/av/proxy-image?piurl=https%3A%2F%2Ftse2.mm.bing.net%2Fth%3Fid%3DOIP.-qfzIT4CgqCFPRo5OsjItwHaMJ%26pid%3DApi&sp=1743826271T7c93ac00e94f0814063f50464d4b909d688c1d9fa16e227d4e882e01a00ff28b') no-repeat center center fixed; /* Change this URL to your anime image URL */
+            background-size: cover; /* Make the background cover the whole page */
+            background-position: center;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -30,7 +32,7 @@ if (isset($_SESSION['username'])) {
 
         .auth-container {
             text-align: center;
-            background-color: #fff;
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
             padding: 30px;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -73,7 +75,7 @@ if (isset($_SESSION['username'])) {
 </head>
 <body>
     <div class="auth-container">
-        <h1>Welcome</h1>
+        <h1>Welcome dear</h1>
         <p>Log in to continue or register for a new account.</p>
 
         <div class="auth-buttons">
