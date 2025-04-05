@@ -1,19 +1,31 @@
 <?php
 include 'config.php';
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = $_POST["username"];
-    $email = $_POST["email"];
-    $password = password_hash($_POST["password"], PASSWORD_BCRYPT);
-    $verification_code = md5(uniqid(rand(), true));
+if (isset($_GET['code'])) {
+    $verification_code = $_GET['code'];
 
-    $stmt = $conn->prepare("INSERT INTO users (username, email, password, verification_code) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("ssss", $username, $email, $password, $verification_code);
+    // Check if the verification code exists in the database
+    $stmt = $conn->prepare("SELECT id FROM users WHERE verification_code = ?");
+    $stmt->bind_param("s", $verification_code);
+    $stmt->execute();
+    $stmt->store_result();
 
-    if ($stmt->execute()) {
-        $verification_link = "http://localhost/auth_system/verify.php?code=$verification_code";
-        echo "Verify your account using this link: <a href='$verification_link'>$verification_link</a>";
+    if ($stmt->num_rows > 0) {
+        // Code found, activate user
+        $stmt->close();
+        
+        // Update the user to mark the email as verified
+        $stmt = $conn->prepare("UPDATE users SET is_verified = 1 WHERE verification_code = ?");
+        $stmt->bind_param("s", $verification_code);
+        if ($stmt->execute()) {
+            echo "Your account has been verified. You can now log in.";
+        } else {
+            echo "There was an issue verifying your account. Please try again later.";
+        }
     } else {
-        echo "Registration failed!";
+        echo "Invalid verification link.";
     }
+} else {
+    echo "No verification code provided.";
 }
+?>
