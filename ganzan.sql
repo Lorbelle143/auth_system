@@ -1,4 +1,4 @@
-USE auth_system;
+USE ganzan;
 
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
