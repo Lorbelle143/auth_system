@@ -8,48 +8,20 @@ require 'config.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-    $otp = rand(100000, 999999);
-    $expiry = date("Y-m-d H:i:s", strtotime("+10 minutes"));
+    $password = $_POST['password'];
+    $username = $_POST['username'];  // Get the username from the form
 
-    // First check if email exists
-    $check_stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
-    $check_stmt->bind_param("s", $email);
-    $check_stmt->execute();
-    $result = $check_stmt->get_result();
-    
-    if ($result->num_rows > 0) {
-        echo "This email is already registered!";
+    // Proceed with registration (allow duplicate emails)
+    $password_hashed = password_hash($password, PASSWORD_DEFAULT);  // Hash the password before storing it
+
+    // Insert new user into the database
+    $stmt = $conn->prepare("INSERT INTO user (username, email, password) VALUES (?, ?, ?)");
+    $stmt->bind_param("sss", $username, $email, $password_hashed);
+
+    if ($stmt->execute()) {
+        echo "Registration successful! <a href='login.php'>Login Now</a>";
     } else {
-        $stmt = $conn->prepare("INSERT INTO users (email, password, otp, otp_expiry) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("ssss", $email, $password, $otp, $expiry);
-        
-        if ($stmt->execute()) {
-            $mail = new PHPMailer(true);
-            try {
-                $mail->isSMTP();
-                $mail->Host = 'smtp.gmail.com';  // Gmail SMTP server
-                $mail->SMTPAuth = true;
-                $mail->Username = 'lorbelleganzan@gmail.com';  // Your Gmail address
-                // Replace with your new 16-character App Password
-                $mail->Password = 'owhi ofvh evnt zvxs
-';  // Format: 4 groups of 4 characters
-                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                $mail->Port = 587;
-
-                $mail->setFrom('lorbelleganzan@gmail.com', 'lorbelle');  // Set your Gmail and name
-                $mail->addAddress($email);
-                $mail->Subject = "Your OTP Code";
-                $mail->Body    = "Your OTP is $otp. It expires in 10 minutes.";
-
-                $mail->send();
-                echo "OTP sent to your email. <a href='verify.php'>Verify Now</a>";
-            } catch (Exception $e) {
-                echo "Mailer Error: " . $mail->ErrorInfo;
-            }
-        } else {
-            echo "Error occurred during registration!";
-        }
+        echo "Error occurred during registration!";
     }
 }
 ?>
@@ -68,6 +40,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <h2 class="auth-title">Register</h2>
         
         <form method="POST">
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" class="form-control" id="username" name="username" required>
+            </div>
             <div class="mb-3">
                 <label for="email" class="form-label">Email</label>
                 <input type="email" class="form-control" id="email" name="email" required>

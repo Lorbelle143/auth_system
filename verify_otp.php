@@ -1,16 +1,10 @@
 <?php
 date_default_timezone_set('Asia/Manila'); // Adjust to your timezone
-
-// Include Composer autoloader
 require 'vendor/autoload.php';
-
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 require 'config.php';
-
-// Your login and OTP code goes here
-
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
@@ -60,15 +54,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     $mail->send();
 
-                    // Redirect to OTP verification page (with new name)
-                    header("Location: otp_verification.php?email=$email&username=$username");
+                    // Redirect to OTP verification page
+                    header("Location: verify_otp.php?email=$email&username=$username");
                     exit();
                 } catch (Exception $e) {
                     echo "Mailer Error: " . $mail->ErrorInfo;
                 }
             } else {
                 // OTP still valid, ask user to enter the OTP
-                echo "<form method='POST' action='otp_verification.php'>
+                echo "<form method='POST' action='verify_otp.php'>
                         <input type='hidden' name='email' value='$email'>
                         <input type='hidden' name='username' value='$username'>
                         <div class='mb-3'>
@@ -86,39 +80,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="style.css" rel="stylesheet">
-</head>
-<body>
-    <div class="auth-container">
-        <h2 class="auth-title">Login</h2>
-        
-        <form method="POST">
-            <div class="mb-3">
-                <label for="username" class="form-label">Username</label>
-                <input type="text" class="form-control" id="username" name="username" required>
-            </div>
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" name="email" required>
-            </div>
-            <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" name="password" required>
-            </div>
-            <button type="submit" class="btn btn-primary w-100">Login</button>
-        </form>
-        
-        <div class="text-center mt-3">
-            <a href="register.php">Don't have an account? Register</a>
-        </div>
-    </div>
-</body>
-</html>
